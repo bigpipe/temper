@@ -6,22 +6,29 @@
   "scripts": {
     "test": "NODE_ENV=testing ./node_modules/.bin/mocha $(find test -name '*.test.js')"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/3rd-Eden/temper.git"
+  },
   "keywords": [
     "temper",
     "templating",
     "browser",
-    "compile"
+    "compile",
+    "jade",
+    "hogan.js",
+    "handlebars",
+    "ejs"
   ],
   "author": "Arnout Kazemier",
   "license": "MIT",
   "devDependencies": {
-    "chai": "~1.7.2",
-    "mocha": "~1.12.0",
-    "jade": "~0.32.0",
-    "hogan.js": "~2.0.0",
-    "handlebars": "~1.0.12",
-    "ejs": "~0.8.4",
+    "chai": "1.7.x",
+    "mocha": "1.12.x",
+    "jade": "0.33.x",
+    "hogan.js": "2.0.x",
+    "handlebars": "1.0.x",
+    "ejs": "0.8.x",
     "pre-commit": "0.0.4"
   }
 }

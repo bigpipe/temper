@@ -4,6 +4,19 @@ Temper is a small module that compiles your templates for server-side usage and
 client-side usage through one single interface. This makes it easy to create
 isomorphic JavaScript applications, which is awesome.
 
+The following template engines are supported:
+
+- jade, automatically discovered by using the `.jade` extension.
+- ejs, automatically discovered by using the `.ejs` extension.
+- hogan.js, automatically discovered by using the `mustache` extension.
+- mustache, automatically discovered by using the `mustache` extension.
+- handlebars, automatically discovered by using the `mustache` extension.
+
+As you can see from the list above, we support multiple version engines for the
+`mustache` extension. You can supply your preference through the API. If no
+preference is given it will iterate over the template engines and the one that
+is successfully required will be used automatically.
+
 ### Installation
 
 Temper is distributed through npm:

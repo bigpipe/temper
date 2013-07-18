@@ -105,11 +105,12 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
 /**
  * Fetch a compiled version of a template.
  *
- * @param {String} file
+ * @param {String} file The file that needs to be compiled.
+ * @param {String} engine The engine we need to use.
  * @api public
  */
-Temper.prototype.fetch = function fetch(file) {
-  return this.compiled[file] || this.prefetch(file);
+Temper.prototype.fetch = function fetch(file, engine) {
+  return this.compiled[file] || this.prefetch(file, engine);
 };
 
 /**

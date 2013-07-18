@@ -1,0 +1,104 @@
+# Temper
+
+Temper is a small module that compiles your templates for server-side usage and
+client-side usage through one single interface. This makes it easy to create
+isomorphic JavaScript applications, which is awesome.
+
+### Installation
+
+Temper is distributed through npm:
+
+```
+npm install --save temper
+```
+
+### Usage
+
+Temper doesn't depend on any template engines so you need to install these your
+self. For these examples I'm going to assume that you have `jade` installed as
+template engine. Run `npm install --save jade` if this is not the case.
+
+Initialising temper is quite simple:
+
+```js
+'use strict';
+
+var Temper = require('temper')
+  , temper = new Temper();
+```
+
+The following methods can be used to interact with `temper`:
+
+##### temper.prefetch(file, [engine])
+
+The `temper.prefetch` method allows you to pre-compile your template file. This
+is advised as requiring modules and reading files is done synchronous. Simply
+call this method with a file location and an option engine argument.
+
+Temper will try it's best to automatically discover template engines based on
+file extensions, but sometimes this is impossible. There are tons of `mustache`
+compatible template engines and we cannot figure out which one you want based on
+the extension. But for template languages such as `jade` it's quite simple.
+
+```js
+temper.prefetch('/file/path/to/template.jade');
+temper.prefetch('/file/path/to/template.mustache', 'hogan.js');
+```
+
+##### temper.fetch(file, [engine])
+
+The `temper.fetch` method returns the `prefetched` template or it will compile
+it on the fly.
+
+```js
+var data = temper.fetch('/file/path/to/template.jade');
+var data = temper.fetch('/file/path/to/template.mustache', 'hogan.js');
+```
+
+### Data structure
+
+The fetch method returns an JavaScript object that contains the following
+properties:
+
+<dl>
+  <dt>library</dt>
+  <dd>
+    This is an optional property. Some of the supported engines require a helper
+    library to be included at the client-side. If this property is not empty you
+    should include this string together with your client side template on your
+    page.
+  </dd>
+
+  <dt>client</dt>
+  <dd>
+    The client-side compatible version of your given template. This is already
+    converted to a string for your convenience.
+  </dd>
+  
+  <dt>server</dt>
+  <dd>
+    The server-side compatible version of your given template. It's a function
+    that's ready to be used.
+  </dd>
+  
+  <dt>engine</dt>
+  <dd>
+    The name of the template engine that was used to compile your template.
+  </dd>
+</dl>
+
+### The interface
+
+The resulting compiled template have a uniform interface. It's a function that
+accepts the template data as first argument and returns the generated template.
+
+```js
+var template = temper.fetch('/file/path/to/template.jade')
+  , html = template({ foo: 'bar' });
+
+console.log(html);
+```
+
+## License
+
+MIT

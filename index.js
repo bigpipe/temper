@@ -155,7 +155,7 @@ Temper.prototype.discover = function discover(file) {
   // We couldn't find any valid template engines for the given file. Prompt the
   // user to install one of our supported template engines.
   //
-  throw new Error('No valid template engine installed, please install '+ list.join('or'));
+  throw new Error('No compatible template engine installed, please run: npm install --save '+ list.pop());
 };
 
 /**

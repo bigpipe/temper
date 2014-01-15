@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/3rd-Eden/temper.git"
+    "url": "git://github.com/bigpipe/temper.git"
   },
   "keywords": [
     "temper",
@@ -29,6 +29,6 @@
     "hogan.js": "2.0.x",
     "handlebars": "1.0.x",
     "ejs": "0.8.x",
-    "pre-commit": "0.0.4"
+    "pre-commit": "0.0.x"
   }
 }

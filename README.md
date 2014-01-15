@@ -1,6 +1,6 @@
 # Temper
 
-[![Build Status](https://travis-ci.org/3rd-Eden/temper.png?branch=master)](https://travis-ci.org/3rd-Eden/temper)
+[![Build Status](https://travis-ci.org/bigpipe/temper.png?branch=master)](https://travis-ci.org/bigpipe/temper)
 
 Temper is a small module that compiles your templates for server-side usage and
 client-side usage through one single interface. This makes it easy to create

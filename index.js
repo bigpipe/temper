@@ -40,6 +40,8 @@ Temper.prototype.supported = {
 Temper.prototype.require = function requires(engine) {
   if (engine in this.required) return this.required[engine];
 
+  var temper = this;
+
   try { this.required[engine] = require(engine); }
   catch (e) {
     throw new Error('The '+ engine +' module isnt installed. Run npm install --save '+ engine);
@@ -49,8 +51,8 @@ Temper.prototype.require = function requires(engine) {
   // Release the cached template compilers again, there is no need to keep it.
   //
   setTimeout(function cleanup() {
-    delete this.required[engine];
-  }.bind(this), 5 * 60 * 1000);
+    delete temper.required[engine];
+  }, 5 * 60 * 1000);
 
   return this.required[engine];
 };
@@ -65,6 +67,8 @@ Temper.prototype.require = function requires(engine) {
 Temper.prototype.read = function read(file) {
   if (file in this.file) return this.file[file];
 
+  var temper = this;
+
   //
   // Temporarily store the file in our cache. Remove it after a while because
   // we're going to compile the source to a template function anyways so this
@@ -73,8 +77,8 @@ Temper.prototype.read = function read(file) {
   this.file[file] = fs.readFileSync(file, 'utf-8');
 
   setTimeout(function cleanup() {
-    delete this.file[file];
-  }.bind(this), 60 * 1000);
+    delete temper.file[file];
+  }, 60 * 1000);
 
   return this.file[file];
 };

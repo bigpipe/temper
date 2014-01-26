@@ -10,9 +10,9 @@ The following template engines are supported:
 
 - jade, automatically discovered by using the `.jade` extension.
 - ejs, automatically discovered by using the `.ejs` extension.
-- hogan.js, automatically discovered by using the `mustache` extension.
-- mustache, automatically discovered by using the `mustache` extension.
-- handlebars, automatically discovered by using the `mustache` extension.
+- hogan.js, automatically discovered by using the `.mustache` extension.
+- mustache, automatically discovered by using the `.mustache` extension.
+- handlebars, automatically discovered by using the `.mustache` extension.
 
 As you can see from the list above, we support multiple version engines for the
 `mustache` extension. You can supply your preference through the API. If no

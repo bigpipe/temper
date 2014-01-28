@@ -232,7 +232,8 @@ Temper.prototype.compile = function compile(template, engine, name) {
       // Compiling a client is just as simple as for the server, it just
       // requires a little bit of .toString() magic to make it work.
       //
-      client = compiler.compileClient(template, {
+      client = (compiler.compileClient || compiler.compile)(template, {
+        client: true,       // Required for older Jade versions.
         pretty: true,       // Make the code pretty by default.
         compileDebug: false // No debug code plx.
       }).toString().replace('function anonymous', 'function ' + name);

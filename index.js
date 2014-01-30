@@ -110,7 +110,7 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
   // Now that we have all required information we can compile the template in to
   // different sections.
   //
-  compiled = this.compile(template, engine, name, path.basename(file));
+  compiled = this.compile(template, engine, name, file);
 
   if (!this.cache) return compiled;
   return this.compiled[file] = compiled;

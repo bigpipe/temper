@@ -25,10 +25,10 @@
   "devDependencies": {
     "chai": "1.7.x",
     "mocha": "1.12.x",
-    "jade": "1.1.x",
-    "hogan.js": "2.0.x",
-    "handlebars": "1.0.x",
-    "ejs": "0.8.x",
+    "jade": "*",
+    "hogan.js": "*",
+    "handlebars": "*",
+    "ejs": "*",
     "pre-commit": "0.0.x"
   }
 }

@@ -10,7 +10,14 @@ var path = require('path')
  * @constructor
  * @api public
  */
-function Temper() {
+function Temper(options) {
+  options = options || {};
+
+  options.cache = 'cache' in options
+    ? options.cache
+    : process.env.NODE_ENV !== 'production';
+
+  this.cache = options.cache;             // Cache compiled templates.
   this.installed = Object.create(null);   // Installed module for extension cache.
   this.required = Object.create(null);    // Template engine require cache.
   this.compiled = Object.create(null);    // Compiled template cache.
@@ -94,7 +101,8 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
   if (file in this.compiled) return this.compiled[file];
 
   var name = path.basename(file, path.extname(file))
-    , template = this.read(file);
+    , template = this.read(file)
+    , compiled;
 
   engine = engine || this.discover(file);
 
@@ -102,8 +110,10 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
   // Now that we have all required information we can compile the template in to
   // different sections.
   //
-  this.compiled[file] = this.compile(template, engine, name);
-  return this.compiled[file];
+  compiled = this.compile(template, engine, name, path.basename(file));
+
+  if (!this.cache) return compiled;
+  return this.compiled[file] = compiled;
 };
 
 /**
@@ -168,10 +178,11 @@ Temper.prototype.discover = function discover(file) {
  * @param {String} template The templates content.
  * @param {String} engine The name of the template engine.
  * @param {String} name The filename without extension.
+ * @param {String} filename The full filename
  * @returns {Object}
  * @api private
  */
-Temper.prototype.compile = function compile(template, engine, name) {
+Temper.prototype.compile = function compile(template, engine, name, filename) {
   var compiler = this.require(engine)
     , library, directory, server, client;
 
@@ -220,8 +231,9 @@ Temper.prototype.compile = function compile(template, engine, name) {
       // requires a little bit of .toString() magic to make it work.
       //
       client = compiler.compile(template, {
-        client: true,       // Ensure we export it for client usage.
-        compileDebug: false // No debug code plx.
+        client: true,           // Ensure we export it for client usage.
+        compileDebug: false,    // No debug code plx.
+        filename: filename      // Used for debugging.
       }).toString().replace('function anonymous', 'function ' + name);
     break;
 
@@ -233,15 +245,18 @@ Temper.prototype.compile = function compile(template, engine, name) {
       // requires a little bit of .toString() magic to make it work.
       //
       client = (compiler.compileClient || compiler.compile)(template, {
-        client: true,       // Required for older Jade versions.
-        pretty: true,       // Make the code pretty by default.
-        compileDebug: false // No debug code plx.
+        client: true,           // Required for older Jade versions.
+        pretty: true,           // Make the code pretty by default.
+        compileDebug: false,    // No debug code plx.
+        filename: filename      // Used for debugging.
       }).toString().replace('function anonymous', 'function ' + name);
 
       directory = path.dirname(require.resolve(engine));
       library = path.join(directory, 'runtime.js');
     break;
   }
+
+  console.log(location);
 
   return {
     library: library ? this.read(library) : '',   // Front-end library.

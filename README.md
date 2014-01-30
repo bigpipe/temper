@@ -42,6 +42,13 @@ var Temper = require('temper')
   , temper = new Temper();
 ```
 
+The `Temper` constructor allows the following options:
+
+- `cache` should we cache the compiled template, this defaults to `true` if
+  `NODE_ENV` is set to `production`. You usually want to have this disabled during
+  development so you can see the changes in your template without having to
+  restart your node process.
+
 The following methods can be used to interact with `temper`:
 
 ##### temper.prefetch(file, [engine])

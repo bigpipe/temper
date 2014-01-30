@@ -256,8 +256,6 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
     break;
   }
 
-  console.log(location);
-
   return {
     library: library ? this.read(library) : '',   // Front-end library.
     client: client,                               // Pre-compiled code.

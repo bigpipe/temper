@@ -14,6 +14,22 @@ describe('temper', function () {
     temper.destroy();
   });
 
+  it('has list with supported types', function () {
+    expect(temper.supported).to.have.property('.ejs');
+    expect(temper.supported).to.have.property('.jade');
+    expect(temper.supported).to.have.property('.mustache');
+    expect(temper.supported).to.have.property('.hbs');
+    expect(temper.supported).to.have.property('.handlebars');
+
+    expect(temper.supported['.ejs']).to.include('ejs');
+    expect(temper.supported['.jade']).to.include('jade');
+    expect(temper.supported['.mustache']).to.include('hogan.js');
+    expect(temper.supported['.mustache']).to.include('mustache');
+    expect(temper.supported['.mustache']).to.include('handlebars');
+    expect(temper.supported['.hbs']).to.include('handlebars');
+    expect(temper.supported['.handlebars']).to.include('handlebars');
+  });
+
   describe('#read', function () {
     it('should read the file contents and return a string', function () {
       var data = temper.read(__dirname +'/fixtures/template.jade');

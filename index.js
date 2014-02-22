@@ -34,7 +34,9 @@ function Temper(options) {
 Temper.prototype.supported = {
   '.ejs': ['ejs'],
   '.jade': ['jade'],
-  '.mustache': ['hogan.js', 'mustache', 'handlebars']
+  '.mustache': ['hogan.js', 'mustache', 'handlebars'],
+  '.hbs': [ 'handlebars' ],
+  '.handlebars': [ 'handlebars' ]
 };
 
 /**

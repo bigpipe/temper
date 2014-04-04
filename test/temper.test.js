@@ -28,6 +28,7 @@ describe('temper', function () {
     expect(temper.supported['.mustache']).to.include('handlebars');
     expect(temper.supported['.hbs']).to.include('handlebars');
     expect(temper.supported['.handlebars']).to.include('handlebars');
+    expect(temper.supported['.html']).to.include('html');
   });
 
   describe('#read', function () {
@@ -62,7 +63,14 @@ describe('temper', function () {
       var jade = temper.require('jade');
 
       expect(jade).to.equal(require('jade'));
-      expect(temper.require('jade')).to.equal(require('jade'));
+      expect(temper.required.jade).to.equal(require('jade'));
+    });
+
+    it('registers engine `null` for HTML', function () {
+      var html = temper.require('html');
+
+      expect(html).to.equal(null);
+      expect(temper.required.html).to.equal(null);
     });
 
     it('throws an error if a module doesnt exist', function () {
@@ -93,6 +101,7 @@ describe('temper', function () {
       expect(temper.discover('foo.jade')).to.equal('jade');
       expect(temper.discover('foo.ejs')).to.equal('ejs');
       expect(temper.discover('foo.mustache')).to.equal('hogan.js');
+      expect(temper.discover('foo.html')).to.equal('html');
     });
   });
 
@@ -104,6 +113,17 @@ describe('temper', function () {
       expect(obj.library).to.be.a('string');
       expect(obj.server).to.be.a('function');
       expect(obj.server()).to.equal('<h1>hello</h1>');
+    });
+
+    it('returns surrogate compiler for HTML', function () {
+      var obj = temper.compile('<h1>regular</h1>', 'html');
+
+      expect(obj.client).to.be.a('string');
+      expect(obj.client).to.equal('<h1>regular</h1>');
+      expect(obj.library).to.be.a('string');
+      expect(obj.library).to.equal('');
+      expect(obj.server).to.be.a('function');
+      expect(obj.server()).to.equal('<h1>regular</h1>');
     });
   });
 });

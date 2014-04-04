@@ -36,7 +36,8 @@ Temper.prototype.supported = {
   '.jade': ['jade'],
   '.mustache': ['hogan.js', 'mustache', 'handlebars'],
   '.hbs': [ 'handlebars' ],
-  '.handlebars': [ 'handlebars' ]
+  '.handlebars': [ 'handlebars' ],
+  '.html': [ 'html' ]
 };
 
 /**
@@ -51,9 +52,9 @@ Temper.prototype.require = function requires(engine) {
 
   var temper = this;
 
-  try { this.required[engine] = require(engine); }
+  try { this.required[engine] = 'html' !== engine ? require(engine) : null; }
   catch (e) {
-    throw new Error('The '+ engine +' module isnt installed. Run npm install --save '+ engine);
+    throw new Error('The '+ engine +' module isn\'t installed. Run npm install --save '+ engine);
   }
 
   //
@@ -255,6 +256,14 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
 
       directory = path.dirname(require.resolve(engine));
       library = path.join(directory, 'runtime.js');
+    break;
+
+    case 'html':
+      engine = 'html';
+      client = template;
+      server = function render() {
+        return template;
+      };
     break;
   }
 

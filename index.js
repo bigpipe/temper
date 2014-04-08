@@ -103,7 +103,7 @@ Temper.prototype.read = function read(file) {
 Temper.prototype.prefetch = function prefetch(file, engine) {
   if (file in this.compiled) return this.compiled[file];
 
-  var name = path.basename(file, path.extname(file))
+  var name = this.normalizeName(file)
     , template = this.read(file)
     , compiled;
 
@@ -117,6 +117,23 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
 
   if (!this.cache) return compiled;
   return this.compiled[file] = compiled;
+};
+
+/**
+ * Convert the filename into a safe javascript function name
+ *
+ * @param {String} file The name of the file to convert into a safe function name
+ * @returns {String} Name to use for the template function in certain supporting compilers.
+ * @api private
+ */
+Temper.prototype.normalizeName = function(file) {
+    var name = path.basename(file, path.extname(file));
+
+    // remove leading numbers
+    name = name.replace(/^[0-9]+/, '');
+
+    // remove all but alphanumeric or _ or $
+    return name.replace(/[^\w$]/g, '');
 };
 
 /**

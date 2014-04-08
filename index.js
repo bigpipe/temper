@@ -8,6 +8,7 @@ var path = require('path')
  * server side equivalents.
  *
  * @constructor
+ * @param {Object} options Temper configuration.
  * @api public
  */
 function Temper(options) {
@@ -36,9 +37,9 @@ Temper.prototype.supported = {
   '.ejs': ['ejs'],
   '.jade': ['jade'],
   '.mustache': ['hogan.js', 'mustache', 'handlebars'],
-  '.hbs': [ 'handlebars' ],
-  '.handlebars': [ 'handlebars' ],
-  '.html': [ 'html' ]
+  '.hbs': ['handlebars'],
+  '.handlebars': ['handlebars'],
+  '.html': ['html']
 };
 
 /**
@@ -279,7 +280,10 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
     break;
 
     case 'html':
-      engine = 'html';
+      //
+      // We need to JSON.stringify the template to prevent it from throwing
+      // errors.
+      //
       client = (new Function(
         'return '+ JSON.stringify(template)
       )).toString().replace('function anonymous', 'function ' + name);

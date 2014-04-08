@@ -126,4 +126,19 @@ describe('temper', function () {
       expect(obj.server()).to.equal('<h1>regular</h1>');
     });
   });
+
+  describe('#normalizeName', function () {
+    it('handles filenames without special characters', function() {
+      var name = temper.normalizeName('/home/templates/template.jade');
+
+      expect(name).to.equal('template');
+    });
+
+    it('handles filenames with special characters in filenames', function() {
+      var name = temper.normalizeName('/home/templates/09$-money_$00-test.jade');
+
+      expect(name).to.equal('$money_$00test');
+    });
+
+  });
 });

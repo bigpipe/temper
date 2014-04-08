@@ -119,11 +119,14 @@ describe('temper', function () {
       var obj = temper.compile('<h1>regular</h1>', 'html');
 
       expect(obj.client).to.be.a('string');
-      expect(obj.client).to.equal('<h1>regular</h1>');
       expect(obj.library).to.be.a('string');
       expect(obj.library).to.equal('');
       expect(obj.server).to.be.a('function');
       expect(obj.server()).to.equal('<h1>regular</h1>');
+
+      var client = (new Function('return '+ obj.client))();
+      expect(client).to.be.a('function');
+      expect(client()).to.equal('<h1>regular</h1>');
     });
   });
 

@@ -21,6 +21,7 @@ function Temper(options) {
   this.installed = Object.create(null);   // Installed module for extension cache.
   this.required = Object.create(null);    // Template engine require cache.
   this.compiled = Object.create(null);    // Compiled template cache.
+  this.timers = Object.create(null);      // Keep track of timeouts.
   this.file = Object.create(null);        // File lookup cache.
 }
 
@@ -60,8 +61,9 @@ Temper.prototype.require = function requires(engine) {
   //
   // Release the cached template compilers again, there is no need to keep it.
   //
-  setTimeout(function cleanup() {
+  this.timers.require = setTimeout(function cleanup() {
     delete temper.required[engine];
+    delete temper.timers.require;
   }, 5 * 60 * 1000);
 
   return this.required[engine];
@@ -86,8 +88,9 @@ Temper.prototype.read = function read(file) {
   //
   this.file[file] = fs.readFileSync(file, 'utf-8');
 
-  setTimeout(function cleanup() {
+  this.timers.read = setTimeout(function cleanup() {
     delete temper.file[file];
+    delete temper.timers.read;
   }, 60 * 1000);
 
   return this.file[file];
@@ -277,7 +280,10 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
 
     case 'html':
       engine = 'html';
-      client = template;
+      client = (new Function(
+        'return '+ JSON.stringify(template)
+      )).toString().replace('function anonymous', 'function ' + name);
+
       server = function render() {
         return template;
       };
@@ -298,7 +304,12 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
  * @api public
  */
 Temper.prototype.destroy = function destroy() {
-  this.installed = this.required = this.compiled = this.file = null;
+  Object.keys(this.timers).forEach(function each(timer) {
+    clearTimeout(this.timers[timer]);
+    delete this.timers[timer];
+  }, this);
+
+  this.installed = this.required = this.compiled = this.file = this.timers = null;
 };
 
 //

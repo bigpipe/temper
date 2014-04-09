@@ -106,13 +106,34 @@ describe('temper', function () {
   });
 
   describe('#compile', function () {
-    it('compiles a jade template', function () {
+    it('compiles a jade template defaulting to pretty', function () {
       var obj = temper.compile('h1 hello', 'jade');
 
       expect(obj.client).to.be.a('string');
       expect(obj.library).to.be.a('string');
       expect(obj.server).to.be.a('function');
-      expect(obj.server()).to.equal('<h1>hello</h1>');
+      expect(obj.server()).to.equal('\n<h1>hello</h1>');
+    });
+
+    it('compiles a pretty jade template when debug is true', function () {
+      var temper = new Temper({ debug: true })
+        , obj = temper.compile('h1 hello\np there', 'jade');
+
+      expect(obj.client).to.be.a('string');
+      expect(obj.library).to.be.a('string');
+      expect(obj.server).to.be.a('function');
+      expect(obj.server()).to.equal('\n<h1>hello</h1>\n<p>there</p>');
+      temper.destroy();
+    });
+
+    it('compiles a minified jade template when debug is false', function () {
+      var temper = new Temper({ debug: false })
+        , obj = temper.compile('h1 hello\np there', 'jade');
+
+      expect(obj.client).to.be.a('string');
+      expect(obj.library).to.be.a('string');
+      expect(obj.server).to.be.a('function');
+      expect(obj.server()).to.equal('<h1>hello</h1><p>there</p>');
     });
 
     it('returns surrogate compiler for HTML', function () {

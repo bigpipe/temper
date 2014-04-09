@@ -18,7 +18,12 @@ function Temper(options) {
     ? options.cache
     : process.env.NODE_ENV !== 'production';
 
+  options.debug = 'debug' in options
+    ? options.debug
+    : process.env.NODE_ENV !== 'production';
+
   this.cache = options.cache;             // Cache compiled templates.
+  this.debug = options.debug;             // Include debug settings when compiling templates.
   this.installed = Object.create(null);   // Installed module for extension cache.
   this.required = Object.create(null);    // Template engine require cache.
   this.compiled = Object.create(null);    // Compiled template cache.
@@ -263,6 +268,7 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
 
     case 'jade':
       server = compiler.compile(template, {
+        pretty: this.debug,     // Include indentation whitespace in generated html.
         filename: filename      // Required for includes and used for debugging.
       });
 
@@ -272,7 +278,7 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
       //
       client = (compiler.compileClient || compiler.compile)(template, {
         client: true,           // Required for older Jade versions.
-        pretty: true,           // Make the code pretty by default.
+        pretty: this.debug,     // Include indentation whitespace in generated html.
         compileDebug: false,    // No debug code plx.
         filename: filename      // Required for includes and used for debugging.
       }).toString().replace('function anonymous', 'function ' + name);

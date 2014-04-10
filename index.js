@@ -248,7 +248,9 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
     break;
 
     case 'ejs':
-      server = compiler.compile(template);
+      server = compiler.compile(template, {
+        filename: filename      // Used for debugging.
+      });
 
       //
       // Compiling a client is just as simple as for the server, it just
@@ -272,7 +274,7 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
       //
       client = (compiler.compileClient || compiler.compile)(template, {
         client: true,           // Required for older Jade versions.
-        pretty: true,           // Make the code pretty by default.
+        pretty: false,          // Prevent pretty code as it inserts unwanted data.
         compileDebug: false,    // No debug code plx.
         filename: filename      // Required for includes and used for debugging.
       }).toString().replace('function anonymous', 'function ' + name);

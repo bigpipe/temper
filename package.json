@@ -31,5 +31,8 @@
     "handlebars": "*",
     "ejs": "*",
     "pre-commit": "0.0.x"
+  },
+  "dependencies": {
+    "debug": "0.8.x"
   }
 }

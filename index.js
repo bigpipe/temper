@@ -1,6 +1,7 @@
 'use strict';
 
-var path = require('path')
+var debug = require('debug')('temper')
+  , path = require('path')
   , fs = require('fs');
 
 /**
@@ -62,9 +63,11 @@ Temper.prototype.require = function requires(engine) {
   //
   // Release the cached template compilers again, there is no need to keep it.
   //
-  this.timers.require = setTimeout(function cleanup() {
+  this.timers['require-'+ engine] = setTimeout(function cleanup() {
+    debug('removing cached engine (%s) to reduce memory', engine);
+
     delete temper.required[engine];
-    delete temper.timers.require;
+    delete temper.timers['require-'+ engine];
   }, 5 * 60 * 1000);
 
   return this.required[engine];
@@ -89,9 +92,11 @@ Temper.prototype.read = function read(file) {
   //
   this.file[file] = fs.readFileSync(file, 'utf-8');
 
-  this.timers.read = setTimeout(function cleanup() {
+  this.timers['read-'+ file] = setTimeout(function cleanup() {
+    debug('removing cached template (%s) to reduce memory', file);
+
     delete temper.file[file];
-    delete temper.timers.read;
+    delete temper.timers['read-'+ file];
   }, 60 * 1000);
 
   return this.file[file];
@@ -120,6 +125,8 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
   compiled = this.compile(template, engine, name, file);
 
   if (!this.cache) return compiled;
+
+  debug('caching compiled template (%s)', file);
   return this.compiled[file] = compiled;
 };
 
@@ -173,13 +180,19 @@ Temper.prototype.discover = function discover(file) {
   //
   // A unknown file extension, we have no clue how to process this, so throw.
   //
-  if (!list) throw new Error('Unknown file extension. '+ extname + ' is not supported');
+  if (!list) {
+    debug('file %s required an template engine that we\'re not supporting', file);
+    throw new Error('Unknown file extension. '+ extname +' is not supported');
+  }
 
   found = list.filter(function filter(engine) {
     var compiler;
 
     try { compiler = temper.require(engine); }
-    catch (e) { return false; }
+    catch (e) {
+      debug('failed to require %s to compile template, searching for another', engine);
+      return false;
+    }
 
     temper.required[engine] = compiler;
     temper.installed[extname] = engine;
@@ -193,6 +206,7 @@ Temper.prototype.discover = function discover(file) {
   // We couldn't find any valid template engines for the given file. Prompt the
   // user to install one of our supported template engines.
   //
+  debug('failed to compile template %s missing template engines %s', file, list.join());
   throw new Error('No compatible template engine installed, please run: npm install --save '+ list[0]);
 };
 
@@ -297,6 +311,8 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
       };
     break;
   }
+
+  debug('compiled template %s using engine %s', filename, engine);
 
   return {
     library: library ? this.read(library) : '',   // Front-end library.

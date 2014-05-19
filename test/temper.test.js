@@ -115,18 +115,29 @@ describe('temper', function () {
       expect(obj.server()).to.equal('<h1>hello</h1>');
     });
 
-    it('returns surrogate compiler for HTML', function () {
-      var obj = temper.compile('<h1>regular</h1>', 'html');
+    describe('.html', function () {
+      it('returns surrogate compiler for HTML', function () {
+        var obj = temper.compile('<h1>regular</h1>', 'html');
 
-      expect(obj.client).to.be.a('string');
-      expect(obj.library).to.be.a('string');
-      expect(obj.library).to.equal('');
-      expect(obj.server).to.be.a('function');
-      expect(obj.server()).to.equal('<h1>regular</h1>');
+        expect(obj.client).to.be.a('string');
+        expect(obj.library).to.be.a('string');
+        expect(obj.library).to.equal('');
+        expect(obj.server).to.be.a('function');
+        expect(obj.server()).to.equal('<h1>regular</h1>');
 
-      var client = (new Function('return '+ obj.client))();
-      expect(client).to.be.a('function');
-      expect(client()).to.equal('<h1>regular</h1>');
+        var client = (new Function('return '+ obj.client))();
+        expect(client).to.be.a('function');
+        expect(client()).to.equal('<h1>regular</h1>');
+      });
+
+      it('supports basic replacements of data', function () {
+        var obj = temper.compile('<h1>{key}</h1>', 'html');
+
+        obj.client = (new Function('return '+ obj.client))();
+
+        expect(obj.server({ key: 'bar' })).to.equal('<h1>bar</h1>');
+        expect(obj.client({ key: 'bar' })).to.equal('<h1>bar</h1>');
+      });
     });
   });
 

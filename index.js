@@ -302,12 +302,14 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
       // We need to JSON.stringify the template to prevent it from throwing
       // errors.
       //
-      client = (new Function(
-        'return '+ JSON.stringify(template)
+      client = (new Function('data', [
+        Temper.html.toString(),
+        'return html('+ JSON.stringify(template) +', data || {});'
+      ].join('\n')
       )).toString().replace('function anonymous', 'function ' + name);
 
-      server = function render() {
-        return template;
+      server = function render(data) {
+        return Temper.html(template, data || {});
       };
     break;
   }
@@ -320,6 +322,24 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
     server: server,                               // Compiled template.
     engine: engine                                // The engine's name.
   };
+};
+
+/**
+ * Minimal HTML template engine for simple placeholder replacements.
+ *
+ * @param {String} template HTML template
+ * @param {Object} data Template data
+ * @returns {String}
+ * @api private
+ */
+Temper.html = function html(template, data, key) {
+  for (key in data) {
+    if (data.hasOwnProperty(key)) {
+      template = template.replace(new RegExp('{'+ key +'}','g'), data[key]);
+    }
+  }
+
+  return template;
 };
 
 /**

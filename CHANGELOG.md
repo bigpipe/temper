@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 0.2
+
+- Upgraded the HTML engine to support basic replace in templates if data is
+  provided.
+- Added useful debug in formation using the `debug` library.
+
 ### 0.1.1
 
 - Added backwards compatibility with older jade versions that do not have

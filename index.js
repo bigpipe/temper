@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('temper')
+var debug = require('diagnostics')('temper')
   , path = require('path')
   , fs = require('fs');
 

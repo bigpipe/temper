@@ -113,6 +113,10 @@ describe('temper', function () {
       expect(obj.library).to.be.a('string');
       expect(obj.server).to.be.a('function');
       expect(obj.server()).to.equal('<h1>hello</h1>');
+      expect(obj.hash).to.be.a('object');
+      expect(obj.hash.client).to.be.a('string');
+      expect(obj.hash.server).to.be.a('string');
+      expect(obj.hash.library).to.be.a('string');
     });
 
     describe('.html', function () {

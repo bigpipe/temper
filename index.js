@@ -1,6 +1,7 @@
 'use strict';
 
 var debug = require('diagnostics')('temper')
+  , crypto = require('crypto')
   , path = require('path')
   , fs = require('fs');
 
@@ -316,12 +317,33 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
 
   debug('compiled template %s using engine %s', filename, engine);
 
+  //
+  // Read the client-side framework if needed.
+  //
+  library = library ? this.read(library) : '';
+
   return {
-    library: library ? this.read(library) : '',   // Front-end library.
+    library: library,                             // Front-end library.
     client: client,                               // Pre-compiled code.
     server: server,                               // Compiled template.
-    engine: engine                                // The engine's name.
+    engine: engine,                               // The engine's name.
+    hash: {
+      library: this.hash(library),                // Hash of the library.
+      client: this.hash(client),                  // Hash of the client.
+      server: this.hash(server)                   // Hash of the server.
+    }
   };
+};
+
+/**
+ * Generate a hash of the given code.
+ *
+ * @param {String} code The code to hash.
+ * @returns {String} The hash
+ * @api private
+ */
+Temper.prototype.hash = function hash(code) {
+  return crypto.createHash('md5').update(code.toString()).digest('hex');
 };
 
 /**

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 0.2.1
+- Use `diagnostics` as logging/debug library
+- Create a hash of client/library/server of the current compiled files.
+
 ### 0.2
 
 - Upgraded the HTML engine to support basic replace in templates if data is

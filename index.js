@@ -1,6 +1,7 @@
 'use strict';
 
 var debug = require('diagnostics')('temper')
+  , TickTock = require('tick-tock')
   , crypto = require('crypto')
   , path = require('path')
   , fs = require('fs');
@@ -24,7 +25,7 @@ function Temper(options) {
   this.installed = Object.create(null);   // Installed module for extension cache.
   this.required = Object.create(null);    // Template engine require cache.
   this.compiled = Object.create(null);    // Compiled template cache.
-  this.timers = Object.create(null);      // Keep track of timeouts.
+  this.timers = new TickTock(this);       // Keep track of timeouts.
   this.file = Object.create(null);        // File lookup cache.
 }
 
@@ -64,12 +65,10 @@ Temper.prototype.require = function requires(engine) {
   //
   // Release the cached template compilers again, there is no need to keep it.
   //
-  this.timers['require-'+ engine] = setTimeout(function cleanup() {
+  this.timers.setTimeout('require-'+ engine, function cleanup() {
     debug('removing cached engine (%s) to reduce memory', engine);
-
     delete temper.required[engine];
-    delete temper.timers['require-'+ engine];
-  }, 5 * 60 * 1000);
+  }, '5 minutes');
 
   return this.required[engine];
 };
@@ -93,12 +92,10 @@ Temper.prototype.read = function read(file) {
   //
   this.file[file] = fs.readFileSync(file, 'utf-8');
 
-  this.timers['read-'+ file] = setTimeout(function cleanup() {
+  this.timers.setTimeout('read-'+ file, function cleanup() {
     debug('removing cached template (%s) to reduce memory', file);
-
     delete temper.file[file];
-    delete temper.timers['read-'+ file];
-  }, 60 * 1000);
+  }, '1 minute');
 
   return this.file[file];
 };
@@ -355,8 +352,10 @@ Temper.prototype.hash = function hash(code) {
  * @api private
  */
 Temper.html = function html(template, data, key) {
+  var has = {}.hasOwnProperty;
+
   for (key in data) {
-    if (data.hasOwnProperty(key)) {
+    if (has.call(data, key)) {
       template = template.replace(new RegExp('{'+ key +'}','g'), data[key]);
     }
   }
@@ -367,15 +366,16 @@ Temper.html = function html(template, data, key) {
 /**
  * Destroy.
  *
+ * @returns {Boolean}
  * @api public
  */
 Temper.prototype.destroy = function destroy() {
-  Object.keys(this.timers).forEach(function each(timer) {
-    clearTimeout(this.timers[timer]);
-    delete this.timers[timer];
-  }, this);
+  if (this.timers) return false;
 
+  this.timers.destroy();
   this.installed = this.required = this.compiled = this.file = this.timers = null;
+
+  return true;
 };
 
 //

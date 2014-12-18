@@ -24,8 +24,8 @@
   "author": "Arnout Kazemier",
   "license": "MIT",
   "devDependencies": {
-    "chai": "1.9.x",
-    "mocha": "1.20.x",
+    "chai": "1.10.x",
+    "mocha": "2.0.x",
     "jade": "*",
     "hogan.js": "*",
     "handlebars": "*",
@@ -33,6 +33,7 @@
     "pre-commit": "0.0.x"
   },
   "dependencies": {
-    "diagnostics": "0.0.x"
+    "diagnostics": "0.0.x",
+    "tick-tock": "0.1.x"
   }
 }

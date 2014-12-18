@@ -142,6 +142,17 @@ describe('temper', function () {
         expect(obj.server({ key: 'bar' })).to.equal('<h1>bar</h1>');
         expect(obj.client({ key: 'bar' })).to.equal('<h1>bar</h1>');
       });
+
+      it('doesnt die when supplied with an Object.create(null)', function () {
+        var obj = temper.compile('<h1>{key}</h1>', 'html')
+          , data = Object.create(null);
+
+        obj.client = (new Function('return '+ obj.client))();
+
+        data.key = 'bar';
+        expect(obj.server(data)).to.equal('<h1>bar</h1>');
+        expect(obj.client(data)).to.equal('<h1>bar</h1>');
+      });
     });
   });
 

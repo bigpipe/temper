@@ -9,6 +9,10 @@ node_js:
   - "iojs-v1.0"
 before_install:
   - "npm install -g npm@2.1.18"
+script:
+  - "npm run test-travis"
+after_script:
+  - "npm install coveralls@2.11.x && cat coverage/lcov.info | coveralls"
 matrix:
   fast_finish: true
   allow_failures:

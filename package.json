@@ -4,7 +4,10 @@
   "description": "Temper compiles template for client and server side usage.",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=testing ./node_modules/.bin/mocha $(find test -name '*.test.js')"
+    "test": "mocha $(find test -name '*.test.js')",
+    "watch": "mocha --watch $(find test -name '*.test.js')",
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha -- $(find test -name '*.test.js')",
+    "test-travis": "istanbul cover node_modules/.bin/_mocha --report lcovonly -- $(find test -name '*.test.js')"
   },
   "repository": {
     "type": "git",
@@ -25,11 +28,12 @@
   "license": "MIT",
   "devDependencies": {
     "assume": "1.1.x",
-    "mocha": "2.1.x",
-    "jade": "*",
-    "hogan.js": "*",
-    "handlebars": "*",
     "ejs": "*",
+    "handlebars": "*",
+    "hogan.js": "*",
+    "istanbul": "0.3.5",
+    "jade": "*",
+    "mocha": "2.1.x",
     "pre-commit": "1.0.x"
   },
   "dependencies": {

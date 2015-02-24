@@ -31,7 +31,7 @@
     "ejs": "*",
     "handlebars": "*",
     "hogan.js": "*",
-    "istanbul": "0.3.5",
+    "istanbul": "0.3.x",
     "jade": "*",
     "mocha": "2.1.x",
     "pre-commit": "1.0.x"

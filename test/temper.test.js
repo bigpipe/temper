@@ -111,7 +111,9 @@ describe('temper', function () {
   describe('#compile', function () {
     describe('.jade', function () {
       it('compiles a jade template', function () {
-        var obj = temper.compile('h1 hello', 'jade');
+        var obj = temper.compile('h1 hello', {
+          engine: 'jade'
+        });
 
         assume(obj.client).is.a('string');
         assume(obj.library).is.a('string');
@@ -128,7 +130,9 @@ describe('temper', function () {
       var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'react.jsx'), 'utf-8');
 
       it('compiles a jsx template', function () {
-        var obj = temper.compile(template, 'react-jsx');
+        var obj = temper.compile(template, {
+          engine: 'react-jsx'
+        });
 
         assume(obj.client).is.a('string');
         assume(obj.library).is.a('string');
@@ -143,7 +147,9 @@ describe('temper', function () {
 
     describe('.html', function () {
       it('returns surrogate compiler for HTML', function () {
-        var obj = temper.compile('<h1>regular</h1>', 'html');
+        var obj = temper.compile('<h1>regular</h1>', {
+          engine: 'html'
+        });
 
         assume(obj.client).is.a('string');
         assume(obj.library).is.a('string');
@@ -157,7 +163,9 @@ describe('temper', function () {
       });
 
       it('supports basic replacements of data', function () {
-        var obj = temper.compile('<h1>{key}</h1>', 'html');
+        var obj = temper.compile('<h1>{key}</h1>', {
+          engine: 'html'
+        });
 
         obj.client = (new Function('return '+ obj.client))();
 
@@ -166,7 +174,7 @@ describe('temper', function () {
       });
 
       it('doesnt die when supplied with an Object.create(null)', function () {
-        var obj = temper.compile('<h1>{key}</h1>', 'html')
+        var obj = temper.compile('<h1>{key}</h1>', { engine: 'html' })
           , data = Object.create(null);
 
         obj.client = (new Function('return '+ obj.client))();

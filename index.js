@@ -114,22 +114,18 @@ Temper.prototype.read = function read(file) {
  *
  * @param {String} file The file that needs to be compiled.
  * @param {String} engine The engine we need to use.
+ * @returns {Object} The compiled template information.
  * @api public
  */
+Temper.prototype.fetch =
 Temper.prototype.prefetch = function prefetch(file, engine) {
   if (file in this.compiled) return this.compiled[file];
 
-  var name = this.normalizeName(file)
-    , template = this.read(file)
-    , compiled;
-
-  engine = engine || this.discover(file);
-
-  //
-  // Now that we have all required information we can compile the template in to
-  // different sections.
-  //
-  compiled = this.compile(template, engine, name, file);
+  var compiled = this.compile(this.read(file), {
+    engine: engine || this.discover(file),
+    name: this.normalizeName(file),
+    filename: file
+  });
 
   if (!this.cache) return compiled;
 
@@ -152,17 +148,6 @@ Temper.prototype.normalizeName = function(file) {
   // Remove all but alphanumeric or _ or $.
   //
   return name.replace(/^[0-9]+/, '').replace(/[^\w$]/g, '');
-};
-
-/**
- * Fetch a compiled version of a template.
- *
- * @param {String} file The file that needs to be compiled.
- * @param {String} engine The engine we need to use.
- * @api public
- */
-Temper.prototype.fetch = function fetch(file, engine) {
-  return this.compiled[file] || this.prefetch(file, engine);
 };
 
 /**
@@ -220,34 +205,34 @@ Temper.prototype.discover = function discover(file) {
 /**
  * Compile a given template to a server side and client side component.
  *
+ * Options:
+ *
+ * - debug: Include debugging information
+ * - engine: The node module that we need to use to compile the templates.
+ * - filename: The full file name.
+ * - name: Safe JS function name.
+ *
  * @param {String} template The templates content.
- * @param {String} engine The name of the template engine.
- * @param {String} name The filename without extension.
- * @param {String} filename The full filename.
+ * @param {Object} options Additional configuration.
  * @returns {Object}
  * @api private
  */
-Temper.prototype.compile = function compile(template, engine, name, filename) {
-  var compiler = this.require(engine, path.extname(filename))
+Temper.prototype.compile = function compile(template, options) {
+  var compiler = this.require(options.engine, path.extname(options.filename))
     , library, directory, server, client;
 
-  switch (engine) {
+  switch (options.engine) {
+    //
+    // Hogan.js template engine from twitter:
+    // @see http://twitter.github.io/hogan.js/
+    //
     case 'hogan.js':
-      //
-      // Create a unform interface for the server, which is a function that just
-      // receieves data and renders a template. So we need to create a closure
-      // as binding data is fucking slow.
-      //
       server = (function hulk(template) {
         return function render(data) {
           return template.render(data);
         };
       })(compiler.compile(template));
 
-      //
-      // Create a uniform interface for the client, same as for the server, we
-      // need to wrap it in a closure.
-      //
       client = [
         '(function hulk() {',
           'var template = new Hogan.Template(',
@@ -256,77 +241,95 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
         'return function render(data) { return template.render(data); };'
       ].join('');
 
-      directory = path.dirname(require.resolve(engine));
+      directory = path.dirname(require.resolve(options.engine));
       library = path.join(directory, 'template.js');
     break;
 
+    //
+    // Handlebars:
+    // @see http://handlebarsjs.com/
+    //
     case 'handlebars':
       server = compiler.compile(template);
       client = compiler.precompile(template);
 
-      directory = path.dirname(require.resolve(engine));
+      directory = path.dirname(require.resolve(options.engine));
       library = path.join(directory, '..', 'dist', 'handlebars.runtime.js');
     break;
 
+    //
+    // ejs: Embedded JavaScript
+    // @see https://github.com/mde/ejs
+    //
     case 'ejs':
       server = compiler.compile(template, {
-        filename: filename      // Used for debugging.
+        compileDebug: options.debug,    // Include debug instrumentation
+        filename: options.filename,     // Used for debugging.
+        debug: options.debug            // Should we output the generated function.
       });
 
-      //
-      // Compiling a client is just as simple as for the server, it just
-      // requires a little bit of .toString() magic to make it work.
-      //
-      client = compiler.compile(template, {
-        client: true,           // Ensure we export it for client usage.
-        compileDebug: false,    // No debug code plx.
-        filename: filename      // Used for debugging.
-      }).toString().replace('function anonymous', 'function ' + name);
+      client = this.transform(compiler.compile(template, {
+        client: true,                   // Ensure we export it for client usage.
+        compileDebug: options.debug,    // Include debug instrumentation.
+        debug: options.debug,           // Should we output the generated function.
+        filename: options.filename      // Used for debugging.
+      }), options.name);
     break;
 
+    //
+    // Jade-lang:
+    // @see https://github.com/jadejs/jade
+    //
     case 'jade':
       server = compiler.compile(template, {
-        filename: filename      // Required for includes and used for debugging.
+        debug: options.debug,           // Should we output the generated function.
+        compileDebug: options.debug,    // Include debug instrumentation.
+        filename: options.filename      // Required for handling includes.
       });
 
-      //
-      // Compiling a client is just as simple as for the server, it just
-      // requires a little bit of .toString() magic to make it work.
-      //
-      client = (compiler.compileClient || compiler.compile)(template, {
-        client: true,           // Required for older Jade versions.
-        pretty: false,          // Prevent pretty code as it inserts unwanted data.
-        compileDebug: false,    // No debug code plx.
-        filename: filename      // Required for includes and used for debugging.
-      }).toString().replace('function anonymous', 'function ' + name);
+      client = this.transform((compiler.compileClient || compiler.compile)(template, {
+        client: true,                   // Required for older Jade versions.
+        pretty: false,                  // Prevent pretty code as it inserts unwanted data.
+        debug: options.debug,           // Should we output the generated function.
+        compileDebug: options.debug,    // Include debug instrumentation.
+        filename: options.filename      // Required for handling includes.
+      }), options.name);
 
-      directory = path.dirname(require.resolve(engine));
+      directory = path.dirname(require.resolve(options.engine));
       library = path.join(directory, 'runtime.js');
     break;
 
+    //
+    // React JSX:
+    // @see https://github.com/bigpipe/react-jsx
+    //
     case 'react-jsx':
-      client = compiler.client(template, {
-        filename: filename,
-        debug: false
-      }).toString().replace('function anonymous', 'function ' + name);
+      client = this.transform(compiler.client(template, {
+        filename: options.filename,   // Required for source map generation.
+        debug: options.debug          // Include inline source-maps.
+      }), options.name);
 
       server = compiler.server(template, {
-        filename: filename,
-        debug: false,
+        filename: options.filename,   // Required for source map generation.
+        debug: options.debug,         // Include inline source-maps.
         raw: true
       });
     break;
 
+    //
+    // Plain ol HTML Files.
+    //
     case 'html':
-      //
-      // We need to JSON.stringify the template to prevent it from throwing
-      // errors.
-      //
-      client = (new Function('data', [
-        Temper.html.toString(),
-        'return html('+ JSON.stringify(template) +', data || {});'
-      ].join('\n')
-      )).toString().replace('function anonymous', 'function ' + name);
+      client = this.transform(
+        new Function('data', [
+          Temper.html.toString(),
+          //
+          // We need to JSON.stringify the template to prevent it from throwing
+          // errors.
+          //
+          'return html('+ JSON.stringify(template) +', data || {});'
+        ].join('\n')
+      ), options.name);
 
       server = function render(data) {
         return Temper.html(template, data || {});
@@ -334,7 +337,7 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
     break;
   }
 
-  debug('compiled template %s using engine %s', filename, engine);
+  debug('compiled template %s using engine %s', options.filename, options.engine);
 
   //
   // Read the client-side framework if needed.
@@ -345,13 +348,25 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
     library: library,                             // Front-end library.
     client: client,                               // Pre-compiled code.
     server: server,                               // Compiled template.
-    engine: engine,                               // The engine's name.
+    engine: options.engine,                       // The engine's name.
     hash: {
       library: this.hash(library),                // Hash of the library.
       client: this.hash(client),                  // Hash of the client.
       server: this.hash(server)                   // Hash of the server.
     }
   };
+};
+
+/**
+ * Transform an Anonymous function in to a named function string.
+ *
+ * @param {Function} fn The anonymous function.
+ * @param {String} name Actual name of the function.
+ * @returns {String} String representation of the named function.
+ * @api public
+ */
+Temper.prototype.transform = function transform(fn, name) {
+  return fn.toString().replace('function anonymous', 'function ' + name);
 };
 
 /**
@@ -374,7 +389,7 @@ Temper.prototype.hash = function hash(code) {
  * @api private
  */
 Temper.html = function html(template, data, key) {
-  var has = {}.hasOwnProperty;
+  var has = Object.prototype.hasOwnProperty;
 
   for (key in data) {
     if (has.call(data, key)) {

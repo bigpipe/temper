@@ -28,11 +28,11 @@
   "license": "MIT",
   "devDependencies": {
     "assume": "1.1.x",
-    "ejs": "*",
-    "handlebars": "*",
-    "hogan.js": "*",
+    "ejs": "2.3.x",
+    "handlebars": "3.0.x",
+    "hogan.js": "3.0.x",
     "istanbul": "0.3.x",
-    "jade": "*",
+    "jade": "1.9.x",
     "mocha": "2.1.x",
     "pre-commit": "1.0.x",
     "react-jsx": "0.12.x"

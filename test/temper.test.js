@@ -105,17 +105,19 @@ describe('temper', function () {
   });
 
   describe('#compile', function () {
-    it('compiles a jade template', function () {
-      var obj = temper.compile('h1 hello', 'jade');
+    describe('.jade', function () {
+      it('compiles a jade template', function () {
+        var obj = temper.compile('h1 hello', 'jade');
 
-      assume(obj.client).is.a('string');
-      assume(obj.library).is.a('string');
-      assume(obj.server).is.a('function');
-      assume(obj.server()).equals('<h1>hello</h1>');
-      assume(obj.hash).is.a('object');
-      assume(obj.hash.client).is.a('string');
-      assume(obj.hash.server).is.a('string');
-      assume(obj.hash.library).is.a('string');
+        assume(obj.client).is.a('string');
+        assume(obj.library).is.a('string');
+        assume(obj.server).is.a('function');
+        assume(obj.server()).equals('<h1>hello</h1>');
+        assume(obj.hash).is.a('object');
+        assume(obj.hash.client).is.a('string');
+        assume(obj.hash.server).is.a('string');
+        assume(obj.hash.library).is.a('string');
+      });
     });
 
     describe('.html', function () {

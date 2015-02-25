@@ -109,16 +109,19 @@ describe('temper', function () {
   });
 
   describe('#compile', function () {
-    describe('.jade', function () {
+    describe('jade', function () {
+      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'jade.jade'), 'utf-8');
+
       it('compiles a jade template', function () {
-        var obj = temper.compile('h1 hello', {
+        var obj = temper.compile(template, {
           engine: 'jade'
         });
 
         assume(obj.client).is.a('string');
         assume(obj.library).is.a('string');
         assume(obj.server).is.a('function');
-        assume(obj.server()).equals('<h1>hello</h1>');
+        assume(obj.server({ V1: 'content' })).equals('<div>content</div>');
+        assume(obj.engine).equals('jade');
         assume(obj.hash).is.a('object');
         assume(obj.hash.client).is.a('string');
         assume(obj.hash.server).is.a('string');
@@ -126,8 +129,8 @@ describe('temper', function () {
       });
     });
 
-    describe('.jsx', function () {
-      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'react.jsx'), 'utf-8');
+    describe('react-jsx', function () {
+      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'react-jsx.jsx'), 'utf-8');
 
       it('compiles a jsx template', function () {
         var obj = temper.compile(template, {
@@ -137,7 +140,68 @@ describe('temper', function () {
         assume(obj.client).is.a('string');
         assume(obj.library).is.a('string');
         assume(obj.server).is.a('function');
-        assume(obj.server()).equals('<div>content</div>');
+        assume(obj.server({ V1: 'content' })).equals('<div>content</div>');
+        assume(obj.engine).equals('react-jsx');
+        assume(obj.hash).is.a('object');
+        assume(obj.hash.client).is.a('string');
+        assume(obj.hash.server).is.a('string');
+        assume(obj.hash.library).is.a('string');
+      });
+    });
+
+    describe('ejs', function () {
+      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'ejs.ejs'), 'utf-8');
+
+      it('compiles a ejs template', function () {
+        var obj = temper.compile(template, {
+          engine: 'ejs'
+        });
+
+        assume(obj.client).is.a('string');
+        assume(obj.library).is.a('string');
+        assume(obj.server).is.a('function');
+        assume(obj.server({ V1: 'content' }).trim()).equals('<div>content</div>');
+        assume(obj.engine).equals('ejs');
+        assume(obj.hash).is.a('object');
+        assume(obj.hash.client).is.a('string');
+        assume(obj.hash.server).is.a('string');
+        assume(obj.hash.library).is.a('string');
+      });
+    });
+
+    describe('hogan.js', function () {
+      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'hogan.mustache'), 'utf-8');
+
+      it('compiles a .mustache template', function () {
+        var obj = temper.compile(template, {
+          engine: 'hogan.js'
+        });
+
+        assume(obj.client).is.a('string');
+        assume(obj.library).is.a('string');
+        assume(obj.server).is.a('function');
+        assume(obj.server({ V1: 'content' }).trim()).equals('<div>content</div>');
+        assume(obj.engine).equals('hogan.js');
+        assume(obj.hash).is.a('object');
+        assume(obj.hash.client).is.a('string');
+        assume(obj.hash.server).is.a('string');
+        assume(obj.hash.library).is.a('string');
+      });
+    });
+
+    describe('handlebars', function () {
+      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'handlebars.handlebars'), 'utf-8');
+
+      it('compiles a .handlebars template', function () {
+        var obj = temper.compile(template, {
+          engine: 'handlebars'
+        });
+
+        assume(obj.client).is.a('string');
+        assume(obj.library).is.a('string');
+        assume(obj.server).is.a('function');
+        assume(obj.server({ V1: 'content' }).trim()).equals('<div>content</div>');
+        assume(obj.engine).equals('handlebars');
         assume(obj.hash).is.a('object');
         assume(obj.hash.client).is.a('string');
         assume(obj.hash.server).is.a('string');
@@ -146,8 +210,10 @@ describe('temper', function () {
     });
 
     describe('.html', function () {
+      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'html.html'), 'utf-8');
+
       it('returns surrogate compiler for HTML', function () {
-        var obj = temper.compile('<h1>regular</h1>', {
+        var obj = temper.compile(template, {
           engine: 'html'
         });
 
@@ -155,11 +221,12 @@ describe('temper', function () {
         assume(obj.library).is.a('string');
         assume(obj.library).equals('');
         assume(obj.server).is.a('function');
-        assume(obj.server()).equals('<h1>regular</h1>');
+        assume(obj.engine).equals('html');
+        assume(obj.server({ V1: 'content' }).trim()).equals('<div>content</div>');
 
         var client = (new Function('return '+ obj.client))();
         assume(client).is.a('function');
-        assume(client()).equals('<h1>regular</h1>');
+        assume(client({ V1: 'content' }).trim()).equals('<div>content</div>');
       });
 
       it('supports basic replacements of data', function () {
@@ -173,7 +240,7 @@ describe('temper', function () {
         assume(obj.client({ key: 'bar' })).equals('<h1>bar</h1>');
       });
 
-      it('doesnt die when supplied with an Object.create(null)', function () {
+      it('doesn\'t die when supplied with an Object.create(null)', function () {
         var obj = temper.compile('<h1>{key}</h1>', { engine: 'html' })
           , data = Object.create(null);
 
@@ -197,6 +264,37 @@ describe('temper', function () {
       var name = temper.normalizeName('/home/templates/09$-money_$00-test.jade');
 
       assume(name).equals('$money_$00test');
+    });
+  });
+
+  describe('#fetch', function () {
+    var template = path.join(__dirname, 'fixtures', 'react-jsx.jsx');
+
+    it('returns a compiled thing', function () {
+      var obj = temper.fetch(template);
+
+      assume(obj.client).is.a('string');
+      assume(obj.library).is.a('string');
+      assume(obj.server).is.a('function');
+      assume(obj.server({ V1: 'content' })).equals('<div>content</div>');
+      assume(obj.engine).equals('react-jsx');
+      assume(obj.hash).is.a('object');
+      assume(obj.hash.client).is.a('string');
+      assume(obj.hash.server).is.a('string');
+      assume(obj.hash.library).is.a('string');
+    });
+
+    it('can cache the compiled result', function () {
+      temper.cache = true;
+
+      assume(temper.compiled).does.not.include(template);
+      temper.fetch(template);
+      assume(temper.compiled).does.include(template);
+
+      temper.compiled[template].foo = 'bar';
+
+      var cached = temper.fetch(template);
+      assume(cached.foo).equals('bar');
     });
   });
 });

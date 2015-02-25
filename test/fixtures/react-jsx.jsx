@@ -1,3 +1,3 @@
 /** @jsx React.DOM */
 
-<div>content</div>;
+<div>{V1}</div>;

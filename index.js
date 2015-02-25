@@ -15,18 +15,19 @@ var debug = require('diagnostics')('temper')
  * @api public
  */
 function Temper(options) {
+  if (!this) return new Temper(options);
   options = options || {};
 
   options.cache = 'cache' in options
     ? options.cache
     : process.env.NODE_ENV !== 'production';
 
-  this.cache = options.cache;             // Cache compiled templates.
   this.installed = Object.create(null);   // Installed module for extension cache.
   this.required = Object.create(null);    // Template engine require cache.
   this.compiled = Object.create(null);    // Compiled template cache.
   this.timers = new TickTock(this);       // Keep track of timeouts.
   this.file = Object.create(null);        // File lookup cache.
+  this.cache = options.cache;             // Cache compiled templates.
 }
 
 /**
@@ -38,13 +39,13 @@ function Temper(options) {
  * @private
  */
 Temper.prototype.supported = {
-  '.ejs': ['ejs'],
-  '.jade': ['jade'],
   '.mustache': ['hogan.js', 'mustache', 'handlebars'],
-  '.hbs': ['handlebars'],
   '.handlebars': ['handlebars'],
+  '.hbs': ['handlebars'],
+  '.jsx': ['react-jsx'],
   '.html': ['html'],
-  '.jsx': ['react-jsx']
+  '.jade': ['jade'],
+  '.ejs': ['ejs']
 };
 
 /**

@@ -14,6 +14,7 @@ isomorphic JavaScript applications, which is awesome.
 
 The following template engines are supported:
 
+- **react-jsx**, automatically discovered by using the `.jsx` extension.
 - **jade**, automatically discovered by using the `.jade` extension.
 - **ejs**, automatically discovered by using the `.ejs` extension.
 - **hogan.js**, automatically discovered by using the `.mustache` extension.
@@ -58,9 +59,9 @@ The `Temper` constructor allows the following options:
 
 The following methods can be used to interact with `temper`:
 
-##### temper.prefetch(file, [engine])
+##### temper.fetch(file, [engine])
 
-The `temper.prefetch` method allows you to pre-compile your template file. This
+The `temper.fetch` method allows you to pre-compile your template file. This
 is advised as requiring modules and reading files is done synchronous. Simply
 call this method with a file location and an option engine argument.
 
@@ -70,20 +71,9 @@ compatible template engines and we cannot figure out which one you want based on
 the extension. But for template languages such as `jade` it's quite simple.
 
 ```js
-temper.prefetch('/file/path/to/template.jade');
-temper.prefetch('/file/path/to/template.mustache', 'hogan.js');
+var data = temper.prefetch('/file/path/to/template.jade');
+var data = temper.prefetch('/file/path/to/template.mustache', 'hogan.js');
 ```
-
-##### temper.fetch(file, [engine])
-
-The `temper.fetch` method returns the `prefetched` template or it will compile
-it on the fly.
-
-```js
-var data = temper.fetch('/file/path/to/template.jade');
-var data = temper.fetch('/file/path/to/template.mustache', 'hogan.js');
-```
-
 ### Data structure
 
 The fetch method returns an JavaScript object that contains the following
@@ -103,16 +93,21 @@ properties:
     The client-side compatible version of your given template. This is already
     converted to a string for your convenience.
   </dd>
-  
+
   <dt>server</dt>
   <dd>
     The server-side compatible version of your given template. It's a function
     that's ready to be used.
   </dd>
-  
+
   <dt>engine</dt>
   <dd>
     The name of the template engine that was used to compile your template.
+  </dd>
+
+  <dt>hash</dt>
+  <dd>
+    An object that contains the hashes for the library, client and server.
   </dd>
 </dl>
 

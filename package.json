@@ -38,6 +38,7 @@
     "react-jsx": "0.12.x"
   },
   "dependencies": {
+    "demolish": "1.0.x",
     "diagnostics": "0.0.x",
     "tick-tock": "0.1.x"
   }

@@ -2,6 +2,7 @@
 
 var debug = require('diagnostics')('temper')
   , TickTock = require('tick-tock')
+  , destroy = require('demolish')
   , crypto = require('crypto')
   , path = require('path')
   , fs = require('fs');
@@ -401,19 +402,12 @@ Temper.html = function html(template, data, key) {
 };
 
 /**
- * Destroy.
+ * Destroy and completely clean up the temper instance.
  *
  * @returns {Boolean}
  * @api public
  */
-Temper.prototype.destroy = function destroy() {
-  if (this.timers) return false;
-
-  this.timers.destroy();
-  this.installed = this.required = this.compiled = this.file = this.timers = null;
-
-  return true;
-};
+Temper.prototype.destroy = destroy('installed, required, compiled, timers, file');
 
 //
 // Expose temper.

@@ -18,6 +18,10 @@ function Temper(options) {
   if (!this) return new Temper(options);
   options = options || {};
 
+  //
+  // We only want to cache the templates in production as it's so we can easily
+  // change templates when we're developing.
+  //
   options.cache = 'cache' in options
     ? options.cache
     : process.env.NODE_ENV !== 'production';
@@ -68,6 +72,7 @@ Temper.prototype.require = function requires(engine, extname) {
 
   //
   // Release the cached template compilers again, there is no need to keep it.
+  // @TODO also remove them from the `require` cache.
   //
   this.timers.setTimeout('require-'+ engine, function cleanup() {
     debug('removing cached engine (%s) to reduce memory', engine);
@@ -140,13 +145,13 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
  * @api private
  */
 Temper.prototype.normalizeName = function(file) {
-    var name = path.basename(file, path.extname(file));
+  var name = path.basename(file, path.extname(file));
 
-    // remove leading numbers
-    name = name.replace(/^[0-9]+/, '');
-
-    // remove all but alphanumeric or _ or $
-    return name.replace(/[^\w$]/g, '');
+  //
+  // Remove leading numbers.
+  // Remove all but alphanumeric or _ or $.
+  //
+  return name.replace(/^[0-9]+/, '').replace(/[^\w$]/g, '');
 };
 
 /**

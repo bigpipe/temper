@@ -1,6 +1,12 @@
 # Temper
 
-[![Build Status](https://travis-ci.org/bigpipe/temper.png?branch=master)](https://travis-ci.org/bigpipe/temper)
+[![From bigpipe.io][from]](http://bigpipe.io)[![Version npm][version]](http://browsenpm.org/package/temper)[![Build Status][build]](https://travis-ci.org/bigpipe/temper)[![Dependencies][david]](https://david-dm.org/bigpipe/temper)[![Coverage Status][cover]](https://coveralls.io/r/bigpipe/temper?branch=master)
+
+[from]: https://img.shields.io/badge/from-bigpipe.io-9d8dff.svg?style=flat-square
+[version]: http://img.shields.io/npm/v/temper.svg?style=flat-square
+[build]: http://img.shields.io/travis/bigpipe/temper/master.svg?style=flat-square
+[david]: https://img.shields.io/david/bigpipe/temper.svg?style=flat-square
+[cover]: http://img.shields.io/coveralls/bigpipe/temper/master.svg?style=flat-square
 
 Temper is a small module that compiles your templates for server-side usage and
 client-side usage through one single interface. This makes it easy to create

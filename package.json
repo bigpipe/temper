@@ -34,7 +34,8 @@
     "istanbul": "0.3.x",
     "jade": "*",
     "mocha": "2.1.x",
-    "pre-commit": "1.0.x"
+    "pre-commit": "1.0.x",
+    "react-jsx": "0.12.x"
   },
   "dependencies": {
     "diagnostics": "0.0.x",

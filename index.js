@@ -31,7 +31,8 @@ function Temper(options) {
 
 /**
  * List of supported templates engines mapped by file extension for easy
- * detection.
+ * detection. The engines are also the npm modules that should be installed in
+ * order to compile the given template language.
  *
  * @type {Object}
  * @private
@@ -42,24 +43,26 @@ Temper.prototype.supported = {
   '.mustache': ['hogan.js', 'mustache', 'handlebars'],
   '.hbs': ['handlebars'],
   '.handlebars': ['handlebars'],
-  '.html': ['html']
+  '.html': ['html'],
+  '.jsx': ['react-jsx']
 };
 
 /**
  * Require a cached require, or require it normally.
  *
  * @param {String} engine Module name.
+ * @param {String} extname The extension for which we need the compiler.
  * @return {Mixed} The module.
  * @api private
  */
-Temper.prototype.require = function requires(engine) {
+Temper.prototype.require = function requires(engine, extname) {
   if (engine in this.required) return this.required[engine];
 
   var temper = this;
 
   try { this.required[engine] = 'html' !== engine ? require(engine) : null; }
   catch (e) {
-    throw new Error('The '+ engine +' module isn\'t installed. Run npm install --save '+ engine);
+    throw new Error('The '+ engine +' module isn\'t installed which we need to compile '+ extname +' templates. Run `npm install --save '+ engine +'` in the root of your project.');
   }
 
   //
@@ -101,7 +104,7 @@ Temper.prototype.read = function read(file) {
 };
 
 /**
- * Prefetch a new template in to the cache.
+ * Pre-fetch a new template in to the cache.
  *
  * @param {String} file The file that needs to be compiled.
  * @param {String} engine The engine we need to use.
@@ -129,7 +132,7 @@ Temper.prototype.prefetch = function prefetch(file, engine) {
 };
 
 /**
- * Convert the filename into a safe javascript function name
+ * Convert the filename into a safe JavaScript function name
  *
  * @param {String} file The name of the file to convert into a safe function name
  * @returns {String} Name to use for the template function in certain supporting compilers.
@@ -186,7 +189,7 @@ Temper.prototype.discover = function discover(file) {
   found = list.filter(function filter(engine) {
     var compiler;
 
-    try { compiler = temper.require(engine); }
+    try { compiler = temper.require(engine, extname); }
     catch (e) {
       debug('failed to require %s to compile template, searching for another', engine);
       return false;
@@ -214,12 +217,12 @@ Temper.prototype.discover = function discover(file) {
  * @param {String} template The templates content.
  * @param {String} engine The name of the template engine.
  * @param {String} name The filename without extension.
- * @param {String} filename The full filename
+ * @param {String} filename The full filename.
  * @returns {Object}
  * @api private
  */
 Temper.prototype.compile = function compile(template, engine, name, filename) {
-  var compiler = this.require(engine)
+  var compiler = this.require(engine, path.extname(filename))
     , library, directory, server, client;
 
   switch (engine) {
@@ -293,6 +296,19 @@ Temper.prototype.compile = function compile(template, engine, name, filename) {
 
       directory = path.dirname(require.resolve(engine));
       library = path.join(directory, 'runtime.js');
+    break;
+
+    case 'react-jsx':
+      client = compiler.client(template, {
+        filename: filename,
+        debug: false
+      }).toString().replace('function anonymous', 'function ' + name);
+
+      server = compiler.server(template, {
+        filename: filename,
+        debug: false,
+        raw: true
+      });
     break;
 
     case 'html':

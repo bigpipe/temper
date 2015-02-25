@@ -1,8 +1,10 @@
 describe('temper', function () {
   'use strict';
 
-  var Temper = require('../')
-    , assume = require('assume')
+  var assume = require('assume')
+    , Temper = require('../')
+    , path = require('path')
+    , fs = require('fs')
     , temper;
 
   beforeEach(function () {
@@ -18,6 +20,7 @@ describe('temper', function () {
     assume(temper.supported).to.have.property('.jade');
     assume(temper.supported).to.have.property('.mustache');
     assume(temper.supported).to.have.property('.hbs');
+    assume(temper.supported).to.have.property('.jsx');
     assume(temper.supported).to.have.property('.handlebars');
 
     assume(temper.supported['.ejs']).to.include('ejs');
@@ -28,6 +31,7 @@ describe('temper', function () {
     assume(temper.supported['.hbs']).to.include('handlebars');
     assume(temper.supported['.handlebars']).to.include('handlebars');
     assume(temper.supported['.html']).to.include('html');
+    assume(temper.supported['.jsx']).to.include('react-jsx');
   });
 
   describe('#read', function () {
@@ -120,6 +124,23 @@ describe('temper', function () {
       });
     });
 
+    describe('.jsx', function () {
+      var template = fs.readFileSync(path.join(__dirname, 'fixtures', 'react.jsx'), 'utf-8');
+
+      it('compiles a jsx template', function () {
+        var obj = temper.compile(template, 'react-jsx');
+
+        assume(obj.client).is.a('string');
+        assume(obj.library).is.a('string');
+        assume(obj.server).is.a('function');
+        assume(obj.server()).equals('<div>content</div>');
+        assume(obj.hash).is.a('object');
+        assume(obj.hash.client).is.a('string');
+        assume(obj.hash.server).is.a('string');
+        assume(obj.hash.library).is.a('string');
+      });
+    });
+
     describe('.html', function () {
       it('returns surrogate compiler for HTML', function () {
         var obj = temper.compile('<h1>regular</h1>', 'html');
@@ -158,17 +179,16 @@ describe('temper', function () {
   });
 
   describe('#normalizeName', function () {
-    it('handles filenames without special characters', function() {
+    it('handles filenames without special characters', function () {
       var name = temper.normalizeName('/home/templates/template.jade');
 
       assume(name).equals('template');
     });
 
-    it('handles filenames with special characters in filenames', function() {
+    it('handles filenames with special characters in filenames', function () {
       var name = temper.normalizeName('/home/templates/09$-money_$00-test.jade');
 
       assume(name).equals('$money_$00test');
     });
-
   });
 });

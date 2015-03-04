@@ -140,7 +140,7 @@ describe('temper', function () {
         assume(obj.client).is.a('string');
         assume(obj.library).is.a('string');
         assume(obj.server).is.a('function');
-        assume(obj.server({ V1: 'content' })).equals('<div>content</div>');
+        assume(obj.server({ V1: 'content' }, { html: true })).equals('<div>content</div>');
         assume(obj.engine).equals('react-jsx');
         assume(obj.hash).is.a('object');
         assume(obj.hash.client).is.a('string');
@@ -276,7 +276,7 @@ describe('temper', function () {
       assume(obj.client).is.a('string');
       assume(obj.library).is.a('string');
       assume(obj.server).is.a('function');
-      assume(obj.server({ V1: 'content' })).equals('<div>content</div>');
+      assume(obj.server({ V1: 'content' }, { html: true })).equals('<div>content</div>');
       assume(obj.engine).equals('react-jsx');
       assume(obj.hash).is.a('object');
       assume(obj.hash.client).is.a('string');

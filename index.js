@@ -100,7 +100,11 @@ Temper.prototype.read = function read(file) {
   // we're going to compile the source to a template function anyways so this
   // will no longer serve it's use.
   //
-  this.file[file] = fs.readFileSync(file, 'utf-8');
+  try {
+    this.file[file] = fs.readFileSync(file, 'utf-8');
+  } catch (e) {
+    throw new Error('Unable to read '+ file +' due to '+ e.message);
+  }
 
   this.timers.setTimeout('read-'+ file, function cleanup() {
     debug('removing cached template (%s) to reduce memory', file);

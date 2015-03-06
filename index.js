@@ -398,7 +398,14 @@ Temper.html = function html(template, data, key) {
 
   for (key in data) {
     if (has.call(data, key)) {
-      template = template.replace(new RegExp('{'+ key +'}','g'), data[key]);
+      //
+      // Prevent
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#Specifying_a_string_as_a_parameter
+      // from messing up the content.
+      //
+      template = template.replace(new RegExp('{'+ key +'}','g'), function hack() {
+        return data[key];
+      });
     }
   }
 

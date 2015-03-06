@@ -240,6 +240,17 @@ describe('temper', function () {
         assume(obj.client({ key: 'bar' })).equals('<h1>bar</h1>');
       });
 
+      it('doesnt die on replace $\' in strings', function () {
+        var obj = temper.compile('<h1>{key}</h1>', {
+          engine: 'html'
+        });
+
+        obj.client = (new Function('return '+ obj.client))();
+
+        assume(obj.server({ key: '$\'bar' })).equals('<h1>$\'bar</h1>');
+        assume(obj.client({ key: '$\'bar' })).equals('<h1>$\'bar</h1>');
+      });
+
       it('doesn\'t die when supplied with an Object.create(null)', function () {
         var obj = temper.compile('<h1>{key}</h1>', { engine: 'html' })
           , data = Object.create(null);

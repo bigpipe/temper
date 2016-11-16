@@ -27,19 +27,19 @@
   "author": "Arnout Kazemier",
   "license": "MIT",
   "devDependencies": {
-    "assume": "1.1.x",
-    "ejs": "2.3.x",
-    "handlebars": "3.0.x",
+    "assume": "~1.4.1",
+    "ejs": "~2.5.2",
+    "handlebars": "~4.0.6",
     "hogan.js": "3.0.x",
-    "istanbul": "0.3.x",
-    "jade": "1.9.x",
-    "mocha": "2.1.x",
-    "pre-commit": "1.0.x",
-    "react-jsx": "0.12.x"
+    "istanbul": "~0.4.5",
+    "jade": "~1.11.0",
+    "mocha": "~3.1.2",
+    "pre-commit": "~1.1.3",
+    "react-jsx": "~1.0.0"
   },
   "dependencies": {
     "demolish": "1.0.x",
-    "diagnostics": "0.0.x",
-    "tick-tock": "0.1.x"
+    "diagnostics": "~1.0.1",
+    "tick-tock": "~1.0.0"
   }
 }
